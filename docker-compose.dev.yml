@@ -4,8 +4,7 @@ services:
   newsblur_container:
     build: 
       context: ./
-      dockerfile: ./docker/Dockerfile
-    
+      dockerfile: ./docker/dev/Dockerfile
     links:
       - mongo
       - postgres
@@ -23,10 +22,14 @@ services:
       - postgres
       - redis
       - elasticsearch
+    volumes:
+     - .:/opt/newsblur
+    stdin_open: true
+    tty: true
   nginx:
     image: nginx:1.13
     ports:
-      - 8000:80
+      - 8000:8000
     depends_on:
     - newsblur_container
     networks:

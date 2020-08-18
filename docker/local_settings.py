@@ -11,8 +11,8 @@ ADMINS                = (
 
 SERVER_EMAIL          = 'server@newsblur.com'
 HELLO_EMAIL           = 'hello@newsblur.com'
-NEWSBLUR_URL          = 'http://docker.newsblur.com'
-SESSION_COOKIE_DOMAIN = '.newsblur.com'
+NEWSBLUR_URL          = 'http://www.newsblur.com'
+SESSION_COOKIE_DOMAIN = '.nb.local.com'
 
 # ===================
 # = Global Settings =
@@ -25,6 +25,10 @@ SECRET_KEY = 'YOUR SECRET KEY'
 AUTO_PREMIUM_NEW_USERS = True
 AUTO_ENABLE_NEW_USERS = True
 ENFORCE_SIGNUP_CAPTCHA = False
+
+# CACHE_BACKEND = 'dummy:///'
+# CACHE_BACKEND = 'locmem:///'
+# CACHE_BACKEND = 'memcached://127.0.0.1:11211'
 
 CACHES = {
     'default': {
@@ -87,11 +91,10 @@ MONGO_DB = {
     'host': 'mongo',
     'port': 27017
 }
-
 MONGO_ANALYTICS_DB = {
-    'name': 'analytics',
-    'host': 'mongo',
-    'port': 27017
+    'name': 'nbanalytics',
+    'host': '128.0.0.1',
+    'port': 27017,
 }
 
 MONGODB_SLAVE = {
@@ -108,16 +111,14 @@ REDIS = {
 REDIS_PUBSUB = {
     'host': 'redis',
 }
-
-REDIS_PUBSUB_POOL = {
-    'host': 'redis',
-}
 REDIS_STORY = {
     'host': 'redis',
 }
 REDIS_SESSIONS = {
     'host': 'redis',
+    'port': 6379
 }
+
 ELASTICSEARCH_FEED_HOSTS = ["elasticsearch:9200"]
 ELASTICSEARCH_STORY_HOSTS = ["elasticsearch:9200"]
 
@@ -128,8 +129,6 @@ BACKED_BY_AWS = {
 }
 
 ORIGINAL_PAGE_SERVER = "127.0.0.1:3060"
-REMOVE_WWW_FROM_DOMAIN = False
-
 
 # ===========
 # = Logging =
@@ -139,8 +138,32 @@ REMOVE_WWW_FROM_DOMAIN = False
 LOG_TO_STREAM = True
 
 if len(logging._handlerList) < 1:
-    LOG_FILE = '/opt/newsblur/logs/development.log'
+    LOG_FILE = '~/newsblur/logs/development.log'
     logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)-12s: %(message)s',
                             datefmt='%b %d %H:%M:%S',
                             handler=logging.StreamHandler)
+
+S3_ACCESS_KEY = '000000000000000000000'
+S3_SECRET = '000000000000000000000000/0000000000000000'
+S3_BACKUP_BUCKET = 'newsblur_backups'
+S3_PAGES_BUCKET_NAME = 'pages-dev.newsblur.com'
+S3_ICONS_BUCKET_NAME = 'icons-dev.newsblur.com'
+S3_AVATARS_BUCKET_NAME = 'avatars-dev.newsblur.com'
+
+MAILGUN_ACCESS_KEY = 'key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+MAILGUN_SERVER_NAME = 'newsblur.com'
+
+DO_TOKEN_LOG = '0000000000000000000000000000000000000000000000000000000000000000'
+DO_TOKEN_FABRIC = '0000000000000000000000000000000000000000000000000000000000000000'
+
+SERVER_NAME = "nblocalhost"
+NEWSBLUR_URL = 'http://nb.local.com'
+
+SESSION_ENGINE = 'redis_sessions.session'
+
+# CORS_ORIGIN_REGEX_WHITELIST = ('^(https?://)?(\w+\.)?nb.local\.com$', )
+
+YOUTUBE_API_KEY = "000000000000000000000000000000000000000"
+RECAPTCHA_SECRET_KEY = "0000000000000000000000000000000000000000"
+IMAGES_SECRET_KEY = "0000000000000000000000000000000"
