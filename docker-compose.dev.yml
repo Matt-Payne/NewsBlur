@@ -27,7 +27,7 @@ services:
     stdin_open: true
     tty: true
     ulimits:
-      nproc: 10535
+      nproc: 10000
       nofile:
         soft: 10000
         hard: 10000

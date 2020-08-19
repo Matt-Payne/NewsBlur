@@ -23,16 +23,22 @@ services:
       - postgres
       - redis
       - elasticsearch
+    ulimits:
+      nproc: 10000
+      nofile:
+        soft: 10000
+        hard: 10000
   nginx:
     image: nginx:1.13
     ports:
-      - 8000:80
+      - 80:80
     depends_on:
     - newsblur_container
     networks:
     - nginx_network
     volumes:
     - ./docker/nginx:/etc/nginx/conf.d
+    - .:/opt/newsblur
 
   postgres:
     image: postgres:9
