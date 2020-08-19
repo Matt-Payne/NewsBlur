@@ -529,7 +529,7 @@ CELERYBEAT_SCHEDULE = {
 
 MONGO_DB = {
     'host': 'db_mongo:27017',
-    'name': 'newsblur',
+    'name': 'nb.local.com',
 }
 MONGO_ANALYTICS_DB = {
     'host': 'db_mongo_analytics:27017',
@@ -621,7 +621,10 @@ S3_AVATARS_BUCKET_NAME = 'avatars.newsblur.com'
 # = Configurations =
 # ==================
 
-from local_settings import *
+if os.getenv("DOCKERBUILD"):
+    from docker_local_settings import *
+else:
+    from local_settings import *
 
 if not DEBUG:
     INSTALLED_APPS += (
@@ -668,7 +671,7 @@ else:
 # =========
 
 MONGO_DB_DEFAULTS = {
-    'name': 'newsblur',
+    'name': 'nb.local.com',
     'host': 'db_mongo:27017',
     'alias': 'default',
 }
