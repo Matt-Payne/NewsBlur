@@ -77,6 +77,7 @@ DATABASES = {
     'default': {
         'NAME': 'newsblur',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        #'ENGINE': 'django.db.backends.mysql',
         'USER': 'newsblur',
         'PASSWORD': 'newsblur',
         'HOST': 'postgres',
@@ -88,8 +89,7 @@ DATABASES = {
 
 MONGO_DB = {
     'name': 'newsblur',
-    'host': 'mongo',
-    'port': 27017
+    'host': 'mongo'
 }
 MONGO_ANALYTICS_DB = {
     'name': 'nbanalytics',
@@ -128,7 +128,7 @@ BACKED_BY_AWS = {
     'icons_on_s3': False,
 }
 
-ORIGINAL_PAGE_SERVER = "127.0.0.1:3060"
+ORIGINAL_PAGE_SERVER = "node"
 
 # ===========
 # = Logging =

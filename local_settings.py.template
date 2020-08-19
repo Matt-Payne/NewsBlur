@@ -33,7 +33,7 @@ ENFORCE_SIGNUP_CAPTCHA = False
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'redis:6379',
+        'LOCATION': '127.0.0.1:6379',
         'OPTIONS': {
             'DB': 6,
             'PARSER_CLASS': 'redis.connection.HiredisParser'
@@ -77,10 +77,9 @@ DATABASES = {
     'default': {
         'NAME': 'newsblur',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        #'ENGINE': 'django.db.backends.mysql',
         'USER': 'newsblur',
-        'PASSWORD': 'newsblur',
-        'HOST': 'postgres',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
         'OPTIONS': {
             "autocommit": True,
         },
@@ -89,7 +88,8 @@ DATABASES = {
 
 MONGO_DB = {
     'name': 'newsblur',
-    'host': 'mongo'
+    'host': '127.0.0.1',
+    'port': 27017
 }
 MONGO_ANALYTICS_DB = {
     'name': 'nbanalytics',
@@ -98,29 +98,29 @@ MONGO_ANALYTICS_DB = {
 }
 
 MONGODB_SLAVE = {
-    'host': 'mongo'
+    'host': '127.0.0.1'
 }
 
 # Celery RabbitMQ/Redis Broker
-BROKER_URL = "redis://redis:6379/0"
+BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = BROKER_URL
 
 REDIS = {
-    'host': 'redis',
+    'host': '127.0.0.1',
 }
 REDIS_PUBSUB = {
-    'host': 'redis',
+    'host': '127.0.0.1',
 }
 REDIS_STORY = {
-    'host': 'redis',
+    'host': '127.0.0.1',
 }
 REDIS_SESSIONS = {
-    'host': 'redis',
+    'host': '127.0.0.1',
     'port': 6379
 }
 
-ELASTICSEARCH_FEED_HOSTS = ["elasticsearch:9200"]
-ELASTICSEARCH_STORY_HOSTS = ["elasticsearch:9200"]
+ELASTICSEARCH_FEED_HOSTS = ["127.0.0.1:9200"]
+ELASTICSEARCH_STORY_HOSTS = ["127.0.0.1:9200"]
 
 BACKED_BY_AWS = {
     'pages_on_node': False,
@@ -128,7 +128,7 @@ BACKED_BY_AWS = {
     'icons_on_s3': False,
 }
 
-ORIGINAL_PAGE_SERVER = "node"
+ORIGINAL_PAGE_SERVER = "127.0.0.1:3060"
 
 # ===========
 # = Logging =

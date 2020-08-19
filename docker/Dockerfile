@@ -4,7 +4,7 @@ MAINTAINER julien@rottenberg.info
 
 WORKDIR   /opt/newsblur
 ENV       PYTHONPATH=/opt/newsblur
-
+ENV       DOCKERBUILD=True
 COPY      config/requirements.txt /opt/newsblur/
 RUN       set -ex \
           && rundDeps=' \

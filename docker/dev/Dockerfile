@@ -4,6 +4,7 @@ MAINTAINER julien@rottenberg.info
 
 WORKDIR   /opt/newsblur
 ENV       PYTHONPATH=/opt/newsblur
+ENV       DOCKERBUILD=True
 
 COPY      config/requirements.txt /opt/newsblur/
 RUN       set -ex \
@@ -37,6 +38,6 @@ RUN       set -ex \
 
 
 #COPY      . /opt/newsblur/
-COPY      docker/dev/local_settings.py ./local_settings.py
+COPY      docker/local_settings.py ./local_settings.py
 CMD       ["gunicorn", "--bind", ":8000", "wsgi:application"]
 EXPOSE 8000
