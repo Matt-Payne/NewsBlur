@@ -12,7 +12,7 @@ ADMINS                = (
 SERVER_EMAIL          = 'server@newsblur.com'
 HELLO_EMAIL           = 'hello@newsblur.com'
 NEWSBLUR_URL          = 'http://www.newsblur.com'
-SESSION_COOKIE_DOMAIN = '.localhost'
+SESSION_COOKIE_DOMAIN = '.nb.local.com'
 
 # ===================
 # = Global Settings =
@@ -33,7 +33,7 @@ ENFORCE_SIGNUP_CAPTCHA = False
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': '127.0.0.1:6379',
+        'LOCATION': 'redis:6379',
         'OPTIONS': {
             'DB': 6,
             'PARSER_CLASS': 'redis.connection.HiredisParser'
@@ -76,10 +76,11 @@ YOUTUBE_API_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 DATABASES = {
     'default': {
         'NAME': 'newsblur',
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        #'ENGINE': 'django.db.backends.mysql',
         'USER': 'newsblur',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'newsblur',
+        'HOST': 'postgres',
         'OPTIONS': {
             "autocommit": True,
         },
@@ -88,8 +89,7 @@ DATABASES = {
 
 MONGO_DB = {
     'name': 'newsblur',
-    'host': '127.0.0.1',
-    'port': 27017
+    'host': 'mongo'
 }
 MONGO_ANALYTICS_DB = {
     'name': 'nbanalytics',
@@ -98,29 +98,29 @@ MONGO_ANALYTICS_DB = {
 }
 
 MONGODB_SLAVE = {
-    'host': '127.0.0.1'
+    'host': 'mongo'
 }
 
 # Celery RabbitMQ/Redis Broker
-BROKER_URL = "redis://127.0.0.1:6379/0"
+BROKER_URL = "redis://redis:6379/0"
 CELERY_RESULT_BACKEND = BROKER_URL
 
 REDIS = {
-    'host': '127.0.0.1',
+    'host': 'redis',
 }
 REDIS_PUBSUB = {
-    'host': '127.0.0.1',
+    'host': 'redis',
 }
 REDIS_STORY = {
-    'host': '127.0.0.1',
+    'host': 'redis',
 }
 REDIS_SESSIONS = {
-    'host': '127.0.0.1',
+    'host': 'redis',
     'port': 6379
 }
 
-ELASTICSEARCH_FEED_HOSTS = ["127.0.0.1:9200"]
-ELASTICSEARCH_STORY_HOSTS = ["127.0.0.1:9200"]
+ELASTICSEARCH_FEED_HOSTS = ["elasticsearch:9200"]
+ELASTICSEARCH_STORY_HOSTS = ["elasticsearch:9200"]
 
 BACKED_BY_AWS = {
     'pages_on_node': False,
@@ -128,7 +128,7 @@ BACKED_BY_AWS = {
     'icons_on_s3': False,
 }
 
-ORIGINAL_PAGE_SERVER = "127.0.0.1:3060"
+ORIGINAL_PAGE_SERVER = "node"
 
 # ===========
 # = Logging =
