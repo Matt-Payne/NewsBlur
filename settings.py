@@ -287,7 +287,7 @@ SESSION_ENGINE          = 'redis_sessions.session'
 TEST_RUNNER             = "utils.testrunner.TestRunner"
 SESSION_COOKIE_NAME     = 'newsblur_sessionid'
 SESSION_COOKIE_AGE      = 60*60*24*365*2 # 2 years
-SESSION_COOKIE_DOMAIN   = '.newsblur.com'
+SESSION_COOKIE_DOMAIN   = '.nb.local.com'
 SESSION_COOKIE_HTTPONLY = False
 SENTRY_DSN              = 'https://XXXNEWSBLURXXX@app.getsentry.com/99999999'
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
@@ -586,8 +586,8 @@ SESSION_REDIS_DB = 5
 # = Elasticsearch =
 # =================
 
-ELASTICSEARCH_FEED_HOSTS = ['db_search_feed:9200']
-ELASTICSEARCH_STORY_HOSTS = ['db_search_story:9200']
+ELASTICSEARCH_FEED_HOSTS = ['elasticsearch:9200']
+ELASTICSEARCH_STORY_HOSTS = ['elasticsearch:9200']
 
 # ===============
 # = Social APIs =
