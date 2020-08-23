@@ -35,8 +35,5 @@ RUN       set -ex \
             && apt-get purge -y --auto-remove ${buildDeps} \
             && rm -rf /var/lib/apt/lists/*
 
-
-#COPY      . /opt/newsblur/
-COPY      docker/dev/local_settings.py ./local_settings.py
 CMD       ["gunicorn", "--bind", ":8000", "wsgi:application"]
 EXPOSE 8000

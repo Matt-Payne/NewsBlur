@@ -49,7 +49,7 @@ services:
       - POSTGRES_USER=newsblur
       - POSTGRES_PASSWORD=newsblur
     ports:
-      - 5432:5432
+      - '5432:5432'
     volumes:
       - ./docker/postgres:/docker-entrypoint-initdb.d
       - ./docker/volumes/postgres:/var/lib/postgresql/data
