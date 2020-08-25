@@ -85,6 +85,31 @@ services:
       - ./docker/volumes/mongo:/data/db
     networks:
       - mongo_network
+  
+  db_pages:
+    build:
+      context: .
+      dockerfile: docker/node/original_page/Dockerfile
+    container_name: node_original_page
+    restart: unless-stopped
+    ports:
+      - 3060:3060
+  db_text:
+    build:
+      context: .
+      dockerfile: docker/node/original_text/Dockerfile
+    container_name: node_original_text
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+  
+  #haproxy:
+  #  build:
+  #    context: .
+  #    dockerfile: docker/haproxy/Dockerfile
+  #  image: haproxy:1.8.22
+  #  ports:
+  #    - 5000:5000
 
 networks:
   nginx_network:
@@ -97,3 +122,5 @@ networks:
     driver: bridge
   elasticsearch_network:
     driver: bridge
+  haproxy_network:
+    driver: overlay

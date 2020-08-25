@@ -1,6 +1,4 @@
 FROM       python:2.7-slim
-MAINTAINER julien@rottenberg.info
-
 
 WORKDIR   /opt/newsblur
 ENV       PYTHONPATH=/opt/newsblur
