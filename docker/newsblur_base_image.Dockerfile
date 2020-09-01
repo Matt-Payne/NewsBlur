@@ -34,6 +34,5 @@ RUN       set -ex \
             && rm -rf /var/lib/apt/lists/*
 
 
-COPY      . /opt/newsblur/
-COPY      docker/local_settings.py ./local_settings.py
-CMD       ["gunicorn", "--bind", ":8000", "wsgi:application"]
+#COPY      . /srv/newsblur/
+#COPY      docker/local_settings.py ./local_settings.py

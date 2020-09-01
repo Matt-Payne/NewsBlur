@@ -1,0 +1,64 @@
+---
+version: '3'
+services:
+  celerybeat:
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery beat --schedule=/srv/newsblur/data/celerybeat-schedule.db --loglevel=INFO"
+    deploy:
+      placement:
+        constraints:
+        - "node==task"  
+  celeryd:
+    deploy:
+      placement:
+        constraints:
+        - "node==work"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds,update_feeds"
+  celeryd_beat:
+    deploy:
+      placement:
+        constraints:
+        - "node==task"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_tasks -c 3"
+  celeryd_beat_feeds:
+    deploy:
+      placement:
+        constraints:
+        - "node==task"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_feeds_task -c 1"
+  celeryd_news:
+    deploy:
+      placement:
+        constraints:
+        - "node==task"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds"
+  celeryd_search_indexer:
+    deploy:
+      placement:
+        constraints:
+        - "node==task"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer -c 4"
+  celeryd_search_indexer_tasker:
+    deploy:
+      placement:
+        constraints:
+        - "node==task"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer_tasker -c 2"
+  celeryd_work_queue:
+    deploy:
+      placement:
+        constraints:
+        - "node==task"
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q work_queue"
+
+            
+
+        
+    

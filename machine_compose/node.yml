@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  original_pages:
+    environment:
+      - NODE_ENV=production
+    image: jmath1/newsblur_node
+    ports:
+      - 3060:3060
+    command: "node original_page.js"
+    stop_signal: HUP
+  original_text:
+    environment:
+      - NODE_ENV=production
+    image: jmath1/newsblur_node
+    ports:
+      - 3000:3000
+    command: "node node/original_text.js"
+    stop_signal: HUP
+  favicons:
+    #needs a port
+    image: jmath1/newsblur_node
+    environment:
+      - NODE_ENV=production
+    command: "node node/favicons.js"
+    stop_signal: HUP
+  unread:
+    #needs a port
+    image: jmath1/newsblur_node
+    environment:
+      - NODE_ENV=production
+    command: "node node/unread_counts.js"
+    stop_signal: HUP
+  unread_ssl:
+    #needs a port
+    image: jmath1/newsblur_node
+    environment:
+      - NODE_ENV=production
+      - NODE_SSL=on
+    command: "node node/unread_counts.js"
+    stop_signal: HUP

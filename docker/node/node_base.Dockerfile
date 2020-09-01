@@ -1,9 +1,5 @@
-FROM       python:2.7-slim
-
-WORKDIR   /opt/newsblur
-ENV       PYTHONPATH=/opt/newsblur
-ENV       DOCKERBUILD=True
-COPY      config/requirements.txt /opt/newsblur/
+FROM node:14.4.0
+WORKDIR /usr/src/app
 RUN       set -ex \
           && rundDeps=' \
                   libpq5 \
@@ -33,7 +29,5 @@ RUN       set -ex \
             && apt-get purge -y --auto-remove ${buildDeps} \
             && rm -rf /var/lib/apt/lists/*
 
-
-COPY      . /opt/newsblur/
-COPY      docker/local_settings.py ./local_settings.py
-CMD       ["gunicorn", "--bind", ":8000", "wsgi:application"]
+COPY ./node /usr/src/app/
+RUN npm install

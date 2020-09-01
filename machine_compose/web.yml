@@ -1,0 +1,102 @@
+version: '3'
+services:
+  gunicorn:
+    image: jmath1/newsblur
+    command: "gunicorn --bind :8000" wsgi:application"
+    deploy:
+      replicas: 2
+    restart: always
+    networks:
+      - nginx_network
+      - postgres_network
+      - redis_network
+      - mongo_network
+      - elasticsearch_network
+    depends_on:
+      - mongo
+      - postgres
+      - redis
+      - elasticsearch
+    ulimits:
+      nproc: 100000
+      nofile:
+        soft: 100000
+        hard: 100090
+    volumes:
+    - ../:/opt/newsblur/
+  nginx:
+    image: nginx:1.13
+    ports:
+      - 80:80
+    deploy:
+      replicas: 4
+    depends_on:
+    - newsblur_service
+    networks:
+    - nginx_network
+    volumes:
+    - ../docker/nginx:/etc/nginx/conf.d
+    - ../:/opt/newsblur
+
+  postgres:
+    image: postgres:9
+    environment:
+      - POSTGRES_USER=newsblur
+      - POSTGRES_PASSWORD=newsblur
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./docker/postgres:/docker-entrypoint-initdb.d
+      - ./docker/volumes/postgres:/var/lib/postgresql/data
+    networks:
+      - postgres_network
+
+  redis:
+    image: redis:3
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./docker/volumes/redis:/data
+      - ./config/redis.conf:/usr/local/etc/redis_server.conf
+      - ./config/redis_docker.conf:/etc/redis_server.conf
+      - ./docker/volumes/redis.var.lib:/var/lib/redis
+    command: /usr/local/bin/redis-server /usr/local/etc/redis_server.conf
+    networks:
+      - redis_network
+
+
+  elasticsearch:
+    image: elasticsearch:1.7
+    ports:
+      - '9200:9200'
+    volumes:
+      - ./docker/volumes/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - elasticsearch_network
+
+  mongo:
+    image: mongo:3.2
+    ports:
+      - '27017:27017'
+    command: mongod --smallfiles
+    volumes:
+      - ./docker/volumes/mongo:/data/db
+    networks:
+      - mongo_network
+
+networks:
+  nginx_network:
+    driver: overlay
+  postgres_network:
+    driver: overlay
+  redis_network:
+    driver: overlay
+  mongo_network:
+    driver: overlay
+  elasticsearch_network:
+    driver: overlay
+  haproxy_network:
+    driver: overlay
+
+# db_pages should original_pages
+# db_text should be original_text
