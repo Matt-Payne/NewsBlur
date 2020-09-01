@@ -25,7 +25,6 @@ RUN       set -ex \
                             ' \
             && apt-get update \
             && apt-get install -y $rundDeps $buildDeps --no-install-recommends \
-            && pip install -r requirements.txt \
             && apt-get purge -y --auto-remove ${buildDeps} \
             && rm -rf /var/lib/apt/lists/*
 
