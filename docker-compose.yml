@@ -1,7 +1,7 @@
----
 version: '3'
 services:
-  newsblur_container:
+  newsblur_web:
+    container_name: newsblur_web
     build: 
       context: ./
       dockerfile: ./docker/Dockerfile
@@ -12,12 +12,6 @@ services:
       - elasticsearch
       - redis
     restart: always
-    networks:
-      - nginx_network
-      - postgres_network
-      - redis_network
-      - mongo_network
-      - elasticsearch_network
     depends_on:
       - mongo
       - postgres
@@ -29,18 +23,19 @@ services:
         soft: 10000
         hard: 10000
   nginx:
+    container_name: nginx
     image: nginx:1.13
     ports:
       - 80:80
     depends_on:
-    - newsblur_container
-    networks:
-    - nginx_network
+    - newsblur_web
+    - favicons
     volumes:
     - ./docker/nginx:/etc/nginx/conf.d
-    - .:/opt/newsblur
+    - .:/srv/newsblur
 
   postgres:
+    container_name: postgres
     image: postgres:9
     environment:
       - POSTGRES_USER=newsblur
@@ -50,77 +45,152 @@ services:
     volumes:
       - ./docker/postgres:/docker-entrypoint-initdb.d
       - ./docker/volumes/postgres:/var/lib/postgresql/data
-    networks:
-      - postgres_network
 
   redis:
     image: redis:3
     ports:
       - '6379:6379'
+    container_name: redis
     volumes:
       - ./docker/volumes/redis:/data
       - ./config/redis.conf:/usr/local/etc/redis_server.conf
       - ./config/redis_docker.conf:/etc/redis_server.conf
       - ./docker/volumes/redis.var.lib:/var/lib/redis
     command: /usr/local/bin/redis-server /usr/local/etc/redis_server.conf
-    networks:
-      - redis_network
-
 
   elasticsearch:
+    container_name: elasticsearch
     image: elasticsearch:1.7
     ports:
       - '9200:9200'
     volumes:
       - ./docker/volumes/elasticsearch:/usr/share/elasticsearch/data
-    networks:
-      - elasticsearch_network
 
   mongo:
+    container_name: mongo
     image: mongo:3.2
     ports:
-      - '27017:27017'
+      - 27017:27017
     command: mongod --smallfiles
     volumes:
       - ./docker/volumes/mongo:/data/db
-    networks:
-      - mongo_network
-  
-  db_pages:
-    build:
-      context: .
-      dockerfile: docker/node/original_page/Dockerfile
+
+  original_pages:
+    image: jmath1/newsblur_node
     container_name: node_original_page
-    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    command: node original_page.js
     ports:
       - 3060:3060
-  db_text:
+  original_text:
+    image: jmath1/newsblur_node
+    container_name: node_original_text
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 4040:4040
+    command: node original_text.js
+
+  favicons:
+    image: jmath1/newsblur_node
+    container_name: node_favicons
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3030:3030
+    command: node favicons.js
+  
+  unread:
+    container_name: unread
+    image: jmath1/newsblur_node
+    environment:
+      - NODE_ENV=production
+    command: node unread_counts.js
+    stop_signal: HUP
+    ports:
+      - 8889:8889
+
+  celerybeat:
+    container_name: celerybeat
+    image: jmath1/newsblur_base
+    command: bash -c "/srv/newsblur/manage.py celery beat --schedule=/srv/newsblur/data/celerybeat-schedule.db --loglevel=INFO"
+    volumes:
+      - .:/srv/newsblur
+      - ./config:/etc/supervisor/conf.d/
+
+  
+  celeryd:
+    container_name: celeryd
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds,update_feeds"
+    volumes:
+      - .:/srv/newsblur
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+
+  celeryd_beat:
+    container_name: celeryd_beat
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_tasks -c 3"
+    volumes:
+      - .:/srv/newsblur
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+
+  celeryd_beat_feeds:
+    container_name: celeryd_beat_feeds
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_feeds_task -c 1"
+    volumes:
+      - .:/srv/newsblur
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+
+  celeryd_news:
+    container_name: celeryd_news
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds"
+    volumes:
+      - .:/srv/newsblur
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+
+  celeryd_search_indexer:
+    container_name: celeryd_search_indexer
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer -c 4"
+    volumes:
+      - .:/srv/newsblur
+    user: $CURRENT_UID:$CURRENT_GID
+
+  celeryd_search_indexer_tasker:
+    container_name: celeryd_search_indexer_tasker
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer_tasker -c 2"
+    volumes:
+      - .:/srv/newsblur
+    user: $CURRENT_UID:$CURRENT_GID
+
+  celeryd_work_queue:
+    container_name: celeryd_work_queue
+    image: jmath1/newsblur_base
+    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q work_queue"
+    volumes:
+      - .:/srv/newsblur
+    user: $CURRENT_UID:$CURRENT_GID
+
+  monitor:
+    container_name: monitor
+    image: jmath1/newsblur_base 
+    command: bash -c "python /srv/newsblur/flask_monitor/db_monitor.py"
+    volumes:
+      - .:/srv/newsblur
+    ports:
+      - 5000:5000
+
+  haproxy:
     build:
       context: .
-      dockerfile: docker/node/original_text/Dockerfile
-    container_name: node_original_text
-    restart: unless-stopped
+      dockerfile: docker/haproxy/Dockerfile
     ports:
-      - 3000:3000
-  
-  #haproxy:
-  #  build:
-  #    context: .
-  #    dockerfile: docker/haproxy/Dockerfile
-  #  image: haproxy:1.8.22
-  #  ports:
-  #    - 5000:5000
-
-networks:
-  nginx_network:
-    driver: bridge
-  postgres_network:
-    driver: bridge
-  redis_network:
-    driver: bridge
-  mongo_network:
-    driver: bridge
-  elasticsearch_network:
-    driver: bridge
-  haproxy_network:
-    driver: overlay
+      - 80:80
+    volumes:
+      - ./docker/haproxy/haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg
+      - .:/srv/newsblur
