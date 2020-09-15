@@ -26,7 +26,7 @@ services:
     container_name: nginx
     image: nginx:1.13
     ports:
-      - 80:80
+      - 80:81
     depends_on:
     - newsblur_web
     - favicons
@@ -101,7 +101,7 @@ services:
       - 3030:3030
     command: node favicons.js
   
-  unread:
+  node_websocket:
     container_name: unread
     image: jmath1/newsblur_node
     environment:
@@ -109,7 +109,7 @@ services:
     command: node unread_counts.js
     stop_signal: HUP
     ports:
-      - 8889:8889
+      - 8888:8888
 
   celerybeat:
     container_name: celerybeat
