@@ -672,7 +672,7 @@ else:
 
 MONGO_DB_DEFAULTS = {
     'name': 'nb.local.com',
-    'host': 'db_mongo:27017',
+    'host': 'mongo:27017',
     'alias': 'default',
 }
 MONGO_DB = dict(MONGO_DB_DEFAULTS, **MONGO_DB)
