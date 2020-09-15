@@ -93,7 +93,7 @@ MONGO_DB = {
 }
 MONGO_ANALYTICS_DB = {
     'name': 'nbanalytics',
-    'host': '128.0.0.1',
+    'host': 'mongo',
     'port': 27017,
 }
 
