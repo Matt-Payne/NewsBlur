@@ -1,9 +1,7 @@
 FROM       python:2.7-slim
-
-WORKDIR   /opt/newsblur
-ENV       PYTHONPATH=/opt/newsblur
-ENV       DOCKERBUILD=True
-COPY      config/requirements.txt /opt/newsblur/
+WORKDIR   /srv/newsblur
+ENV       PYTHONPATH=/srv/newsblur
+COPY      config/requirements.txt /srv/newsblur/
 RUN       set -ex \
           && rundDeps=' \
                   libpq5 \
