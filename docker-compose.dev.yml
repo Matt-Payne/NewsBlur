@@ -40,6 +40,7 @@ services:
 
   postgres:
     image: postgres:9
+    container_name: postgres
     environment:
       - POSTGRES_USER=newsblur
       - POSTGRES_PASSWORD=newsblur
@@ -103,7 +104,7 @@ services:
       - 3030:3030
     command: node favicons.js
   
-  unread:
+  node_websocket:
     container_name: unread
     image: jmath1/newsblur_node
     environment:
