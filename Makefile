@@ -1,15 +1,16 @@
-newsblur = $(shell docker ps -qf "name=newsblur_container")
+newsblur := $(shell docker ps -qf "name=newsblur_web")
+CURRENT_UID := $(shell id -u)
+CURRENT_GID := $(shell id -g)
 
 stage:
-	- docker-compose up -d --build
+	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d --build --remove-orphans
 
 dev:
-	# need shell logic to see if the full rebuild is necessary
-	#- docker-compose -f docker-compose.dev.yml up -d --build
-	- docker-compose -f docker-compose.dev.yml up -d --build newsblur_container
+	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose -f docker-compose.dev.yml up -d --build --remove-orphans
 
 dev-exec:
-	- docker-compose -f docker-compose.dev.yml exec newsblur_container bash
+	# run `make dev` if this doesn't work
+	- docker attach ${newsblur}
 
 dev-down:
 	- docker-compose -f docker-compose.dev.yml down
