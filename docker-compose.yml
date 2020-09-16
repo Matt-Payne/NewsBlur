@@ -22,6 +22,8 @@ services:
       nofile:
         soft: 10000
         hard: 10000
+    ports:
+      - '8000:8000'
   nginx:
     container_name: nginx
     image: nginx:1.13
@@ -30,6 +32,13 @@ services:
     depends_on:
     - newsblur_web
     - favicons
+    - postgres
+    - redis
+    - mongo
+    - elasticsearch
+    - original_pages
+    - original_text
+    - node_websocket
     volumes:
     - ./docker/nginx:/etc/nginx/conf.d
     - .:/srv/newsblur
@@ -45,6 +54,7 @@ services:
     volumes:
       - ./docker/postgres:/docker-entrypoint-initdb.d
       - ./docker/volumes/postgres:/var/lib/postgresql/data
+      - ./config/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
 
   redis:
     image: redis:3
@@ -102,7 +112,7 @@ services:
     command: node favicons.js
   
   node_websocket:
-    container_name: unread
+    container_name: node_websocket
     image: jmath1/newsblur_node
     environment:
       - NODE_ENV=production
