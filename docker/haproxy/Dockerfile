@@ -24,7 +24,7 @@ COPY docker_local_settings.py docker_local_settings.py
 
 RUN /bin/bash -c 'echo "ENABLED=1" | tee /etc/default/haproxy'
 RUN /bin/bash -c 'mkdir -p /srv/newsblur/config/certificates/'
-COPY config/certificates/newsblur.com.pem config/certificates/newsblur.pem
+COPY config/certificates config/certificates
 COPY config/certificates/newsblur.com.key config/certificates/newsblur.pem 
 COPY 'config/haproxy_rsyslog.conf' '/etc/rsyslog.d/49-haproxy.conf'
 #RUN /bin/bash -c 'restart rsyslog'
