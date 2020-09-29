@@ -3,7 +3,7 @@ CURRENT_UID := $(shell id -u)
 CURRENT_GID := $(shell id -g)
 
 #creates newsblur, builds new images, and creates/refreshes SSL keys
-newsblur:
+nb:
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose down
 	- make keys
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d --build --remove-orphans
