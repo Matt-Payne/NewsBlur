@@ -178,10 +178,17 @@ services:
 
   celeryd_work_queue:
     container_name: celeryd_work_queue
-    image: jmath1/newsblur_base
-    command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q work_queue"
+    build:
+      context: .
+      dockerfile: docker/celeryd_work_queue/Dockerfile
+    command: bash -c "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q work_queue"
+    ports:
+      - 82:82
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
+      - ./docker/celeryd_work_queue/nginx/:/etc/nginx/conf.d
     user: $CURRENT_UID:$CURRENT_GID
 
   monitor:
