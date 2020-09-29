@@ -45,16 +45,14 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:9
+    image: postgres:9.6
     environment:
       - POSTGRES_USER=newsblur
       - POSTGRES_PASSWORD=newsblur
     ports:
       - '5432:5432'
     volumes:
-      - ./docker/postgres:/docker-entrypoint-initdb.d
       - ./docker/volumes/postgres:/var/lib/postgresql/data
-      - ./config/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
 
   redis:
     image: redis:3
