@@ -86,7 +86,7 @@ services:
     image: mongo:3.2
     ports:
       - 27017:27017
-    command: db_mongod --smallfiles
+    command: mongod --smallfiles
     volumes:
       - ./docker/volumes/db_mongo:/data/db
 
