@@ -4,7 +4,8 @@ mongo = require 'mongodb'
 log    = require './log.js'
 
 DEV = process.env.NODE_ENV == 'development'
-MONGODB_SERVER = if DEV then 'localhost' else 'db_mongo'
+DOCKER = process.env.DOCKER_BUILD == "true"
+MONGODB_SERVER = if DEV and not DOCKER then 'localhost' else 'db_mongo'
 MONGODB_PORT = parseInt(process.env.MONGODB_PORT or 27017, 10)
 
 log.debug "Starting NewsBlur Favicon server..."
