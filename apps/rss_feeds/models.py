@@ -1192,8 +1192,9 @@ class Feed(models.Model):
         if feed:
             feed.last_update = datetime.datetime.utcnow()
             feed.set_next_scheduled_update()
-            r.zadd('fetched_feeds_last_hour', feed.pk, int(datetime.datetime.now().strftime('%s')))
-        
+            now = datetime.datetime.now()
+            r.zadd('fetched_feeds_last_hour', feed.pk, int(now.strftime('%s')))
+            r.set('last_successfully_fetched_feed', int(now.strftime('%s')))
         if not feed or original_feed_id != feed.pk:
             logging.info(" ---> ~FRFeed changed id, removing %s from tasked_feeds queue..." % original_feed_id)
             r.zrem('tasked_feeds', original_feed_id)

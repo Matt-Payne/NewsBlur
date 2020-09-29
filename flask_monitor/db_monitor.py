@@ -129,5 +129,21 @@ def db_check_elasticsearch():
     else:
         abort(404)    
 
+@app.route("/work_check/celeryd_work_queue")
+def work_check_celeryd_work_queue():
+    try:
+        r = redis.Redis(connection_pool=settings.REDIS_FEED_UPDATE_POOL)
+    except:
+        abort(502)
+
+    try:
+        last_successfully_fetched_feed = r.get("last_successfully_fetched_feed")
+        now_timestamp = int(datetime.datetime.now().stftime('%s'))
+
+        if now_timestamp - last_successfully_fetched_feed > 60:
+            abort(500)
+    except:
+        abort(502)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
