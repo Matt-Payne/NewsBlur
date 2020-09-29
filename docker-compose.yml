@@ -10,13 +10,13 @@ services:
     stdin_open: true
     tty: true
     links:
-      - mongo
+      - db_mongo
       - postgres
       - elasticsearch
       - redis
     restart: always
     depends_on:
-      - mongo
+      - db_mongo
       - postgres
       - redis
       - elasticsearch
@@ -39,7 +39,7 @@ services:
     - favicons
     - postgres
     - redis
-    - mongo
+    - db_mongo
     - elasticsearch
     - original_pages
     - original_text
@@ -77,18 +77,18 @@ services:
     container_name: elasticsearch
     image: elasticsearch:1.7
     ports:
-      - '9300:9300'
+      - '9200:9200'
     volumes:
       - ./docker/volumes/elasticsearch:/usr/share/elasticsearch/data
 
-  mongo:
-    container_name: mongo
-    image: mongo:3.2
+  db_mongo:
+    container_name: db_mongo
+    image: db_mongo:3.2
     ports:
       - 27017:27017
-    command: mongod --smallfiles
+    command: db_mongod --smallfiles
     volumes:
-      - ./docker/volumes/mongo:/data/db
+      - ./docker/volumes/db_mongo:/data/db
 
   original_pages:
     image: jmath1/newsblur_node
@@ -112,6 +112,7 @@ services:
     container_name: node_favicons
     environment:
       - NODE_ENV=production
+      - DOCKERBUILD=True
     ports:
       - 3030:3030
     command: node favicons.js

@@ -89,16 +89,16 @@ DATABASES = {
 
 MONGO_DB = {
     'name': 'newsblur',
-    'host': 'mongo'
+    'host': 'db_mongo'
 }
 MONGO_ANALYTICS_DB = {
     'name': 'nbanalytics',
-    'host': 'mongo',
+    'host': 'db_mongo',
     'port': 27017,
 }
 
 MONGODB_SLAVE = {
-    'host': 'mongo'
+    'host': 'db_mongo'
 }
 
 # Celery RabbitMQ/Redis Broker
