@@ -1,10 +1,16 @@
 from flask import Flask, abort
-import flask_settings as settings
 import psycopg2
 import pymysql
 import pymongo
 import redis
 import pyes
+import os
+
+if os.getenv("DOCKERBUILD") == "True":
+    import docker_local_settings as settings
+else:
+    import flask_monitor.flask_settings as settings
+
 app = Flask(__name__)
 
 @app.route("/db_check/postgres")
