@@ -94,7 +94,7 @@ services:
     image: jmath1/newsblur_node
     container_name: node_original_page
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     command: node original_page.js
     ports:
       - 3060:3060
@@ -102,7 +102,7 @@ services:
     image: jmath1/newsblur_node
     container_name: node_original_text
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     ports:
       - 4040:4040
     command: node original_text.js
@@ -111,7 +111,7 @@ services:
     image: jmath1/newsblur_node
     container_name: node_favicons
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - DOCKERBUILD=True
     ports:
       - 3030:3030
@@ -121,7 +121,7 @@ services:
     container_name: node_websocket
     image: jmath1/newsblur_node
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=docker
     command: node unread_counts.js
     stop_signal: HUP
     ports:
