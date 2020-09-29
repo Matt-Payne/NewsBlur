@@ -83,7 +83,7 @@ services:
 
   db_mongo:
     container_name: db_mongo
-    image: db_mongo:3.2
+    image: mongo:3.2
     ports:
       - 27017:27017
     command: db_mongod --smallfiles
