@@ -20,7 +20,7 @@ RUN python -m pip install wheel
 #COPY . /opt/newsblur/
 
 #RUN  python2.7 -m pip install -r requirements.txt --user
-COPY local_settings.py.template local_settings.py
+COPY docker_local_settings.py docker_local_settings.py
 
 RUN /bin/bash -c 'echo "ENABLED=1" | tee /etc/default/haproxy'
 RUN /bin/bash -c 'mkdir -p /srv/newsblur/config/certificates/'

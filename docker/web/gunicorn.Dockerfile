@@ -1,4 +1,4 @@
 FROM jplusplus81/newsblur
 
 COPY      . /srv/newsblur/
-COPY      docker/local_settings.py ./local_settings.py
+COPY      docker_local_settings.py docker_local_settings.py
