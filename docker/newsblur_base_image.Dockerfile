@@ -30,7 +30,3 @@ RUN       set -ex \
             && pip install -r requirements.txt \
             && apt-get purge -y --auto-remove ${buildDeps} \
             && rm -rf /var/lib/apt/lists/*
-
-
-#COPY      . /srv/newsblur/
-#COPY      docker/local_settings.py ./local_settings.py
