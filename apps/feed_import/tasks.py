@@ -15,6 +15,8 @@ class ProcessOPML(Task):
         opml_importer = OPMLImporter(opml.opml_file, user)
         opml_importer.process()
         
+        UserSubscription.queue_new_feeds(user)
+
         feed_count = UserSubscription.objects.filter(user=user).count()
         user.profile.send_upload_opml_finished_email(feed_count)
         logging.user(user, "~FR~SBOPML upload (task): ~SK%s~SN~SB~FR feeds" % (feed_count))
