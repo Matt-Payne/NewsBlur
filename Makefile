@@ -35,6 +35,7 @@ keys:
 	- rm config/certificates/RootCA.pem
 	- rm config/certificates/RootCA.crt
 	- rm config/certificates/RootCA.key
+	- mkdir config/certificates
 	- openssl dhparam -out config/certificates/dhparam-2048.pem 2048
 	- openssl req -x509 -nodes -new -sha256 -days 1024 -newkey rsa:2048 -keyout config/certificates/RootCA.key -out config/certificates/RootCA.pem -subj "/C=US/CN=Example-Root-CA"
 	- openssl x509 -outform pem -in config/certificates/RootCA.pem -out config/certificates/RootCA.crt
