@@ -12,24 +12,26 @@
 
   DEV = process.env.NODE_ENV === 'development';
 
-  DOCKER = process.env.DOCKER_BUILD === "true";
+  DOCKER = process.env.NODE_ENV === "docker";
 
-  MONGODB_SERVER = DEV && !DOCKER ? 'localhost' : 'db_mongo';
+  MONGODB_SERVER = DEV ? 'localhost' : 'db_mongo';
 
   MONGODB_PORT = parseInt(process.env.MONGODB_PORT || 27017, 10);
 
   log.debug("Starting NewsBlur Favicon server...");
 
   if (!DEV && !process.env.NODE_ENV) {
-    log.debug("Specify NODE_ENV=<development,production>");
+    log.debug("Specify NODE_ENV=<development,docker,production>");
     return;
   } else if (DEV) {
     log.debug("Running as development server");
+  } else if (DOCKER) {
+    log.debug("Running as docker server");
   } else {
     log.debug("Running as production server");
   }
 
-  if (DEV) {
+  if (DEV || DOCKER) {
     url = "mongodb://" + MONGODB_SERVER + ":" + MONGODB_PORT + "/newsblur";
   } else {
     url = "mongodb://" + MONGODB_SERVER + ":" + MONGODB_PORT + "/newsblur?replicaSet=nbset&readPreference=secondaryPreferred";
@@ -63,7 +65,7 @@
           return res.status(200).send(body);
         } else {
           log.debug(("Redirect: " + feed_id + ", etag: " + etag + "/" + (docs != null ? docs.color : void 0) + " ") + (err ? "(err: " + err + ")" : ""));
-          if (DEV) {
+          if (DEV || DOCKER) {
             return res.redirect('/media/img/icons/circular/world.png');
           } else {
             return res.redirect('https://www.newsblur.com/media/img/icons/circular/world.png');

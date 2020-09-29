@@ -111,8 +111,7 @@ services:
     image: jmath1/newsblur_node
     container_name: node_favicons
     environment:
-      - NODE_ENV=development
-      - DOCKERBUILD=True
+      - NODE_ENV=docker
     ports:
       - 3030:3030
     command: node favicons.js
