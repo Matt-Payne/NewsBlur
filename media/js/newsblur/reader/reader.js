@@ -4962,11 +4962,11 @@
             } else if (force || !this.socket || !this.socket.connected) {
                 var server = window.location.protocol + '//' + window.location.hostname;
                 var https = _.string.startsWith(window.location.protocol, 'https');
-                var local = NEWSBLUR.Globals.debug || _.any([], function(hostname) {
+                var haproxy_missing = NEWSBLUR.Globals.debug || _.any([], function (hostname) {
                     return _.string.contains(window.location.host, hostname);
                 });
                 var port = https ? 443 : 80;
-                if (local) {
+                if (haproxy_missing && false) {
                     port = https ? 8889 : 8888;
                 }
                 this.socket = this.socket || io.connect(server + ":" + port, {
