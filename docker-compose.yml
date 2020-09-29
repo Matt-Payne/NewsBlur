@@ -5,7 +5,10 @@ services:
     build: 
       context: ./
       dockerfile: ./docker/Dockerfile
-    
+    environment: 
+      - DOCKERBUILD=True
+    stdin_open: true
+    tty: true
     links:
       - mongo
       - postgres
@@ -24,11 +27,13 @@ services:
         hard: 10000
     ports:
       - '8000:8000'
+    volumes: 
+      - .:/srv/newsblur
   nginx:
     container_name: nginx
     image: nginx:1.13
     ports:
-      - 80:81
+      - 81:81
     depends_on:
     - newsblur_web
     - favicons
@@ -39,6 +44,8 @@ services:
     - original_pages
     - original_text
     - node_websocket
+    environment: 
+      - DOCKERBUILD=True
     volumes:
     - ./docker/nginx:/etc/nginx/conf.d
     - .:/srv/newsblur
@@ -122,7 +129,9 @@ services:
   celerybeat:
     container_name: celerybeat
     image: jmath1/newsblur_base
-    command: bash -c "/srv/newsblur/manage.py celery beat --schedule=/srv/newsblur/data/celerybeat-schedule.db --loglevel=INFO"
+    command: bash -c "mkdir -p data && /srv/newsblur/manage.py celery beat --schedule=/srv/newsblur/data/celerybeat-schedule.db --loglevel=INFO"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
       - ./config:/etc/supervisor/conf.d/
@@ -134,12 +143,16 @@ services:
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds,update_feeds"
     volumes:
       - .:/srv/newsblur
+    environment: 
+      - DOCKERBUILD=True
     user: "${CURRENT_UID}:${CURRENT_GID}"
 
   celeryd_beat:
     container_name: celeryd_beat
     image: jmath1/newsblur_base
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_tasks -c 3"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
     user: "${CURRENT_UID}:${CURRENT_GID}"
@@ -148,6 +161,8 @@ services:
     container_name: celeryd_beat_feeds
     image: jmath1/newsblur_base
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_feeds_task -c 1"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
     user: "${CURRENT_UID}:${CURRENT_GID}"
@@ -156,6 +171,8 @@ services:
     container_name: celeryd_news
     image: jmath1/newsblur_base
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
     user: "${CURRENT_UID}:${CURRENT_GID}"
@@ -164,14 +181,19 @@ services:
     container_name: celeryd_search_indexer
     image: jmath1/newsblur_base
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer -c 4"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
+
     user: $CURRENT_UID:$CURRENT_GID
 
   celeryd_search_indexer_tasker:
     container_name: celeryd_search_indexer_tasker
     image: jmath1/newsblur_base
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer_tasker -c 2"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
     user: $CURRENT_UID:$CURRENT_GID
@@ -195,17 +217,27 @@ services:
     container_name: monitor
     image: jmath1/newsblur_base 
     command: bash -c "python /srv/newsblur/flask_monitor/db_monitor.py"
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - .:/srv/newsblur
     ports:
       - 5000:5000
 
   haproxy:
+    container_name: haproxy
     build:
       context: .
       dockerfile: docker/haproxy/Dockerfile
+    depends_on: 
+      - nginx
+      - newsblur_web
+      - redis
     ports:
       - 80:80
+      - 443:443
+    environment: 
+      - DOCKERBUILD=True
     volumes:
       - ./docker/haproxy/haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg
       - .:/srv/newsblur
