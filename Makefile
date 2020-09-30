@@ -5,7 +5,7 @@ CURRENT_GID := $(shell id -g)
 #creates newsblur, builds new images, and creates/refreshes SSL keys
 nb:
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose down
-	- make keys
+	- [[ -d config/certificates ]] && echo "keys exist" || rm -r config/certificates
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d --build --remove-orphans
 	# wait for the database and then run migrations... there should be a cleaner way to do this
 	- sleep 20
@@ -33,14 +33,7 @@ test:
 	- ./manage.py test --settings=utils.test_settings
 
 keys:
-	- rm config/certificates/localhost.key
-	- rm config/certificates/localhost.pem
-	- rm config/certificates/localhost.crt
-	- rm config/certificates/localhost.csr
-	- rm config/certificates/dhparam-2048.pem
-	- rm config/certificates/RootCA.pem
-	- rm config/certificates/RootCA.crt
-	- rm config/certificates/RootCA.key
+	- rm config/certificates
 	- mkdir config/certificates
 	- openssl dhparam -out config/certificates/dhparam-2048.pem 2048
 	- openssl req -x509 -nodes -new -sha256 -days 1024 -newkey rsa:2048 -keyout config/certificates/RootCA.key -out config/certificates/RootCA.pem -subj "/C=US/CN=Example-Root-CA"
