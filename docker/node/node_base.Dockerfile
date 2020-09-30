@@ -28,5 +28,6 @@ RUN       set -ex \
             && apt-get purge -y --auto-remove ${buildDeps} \
             && rm -rf /var/lib/apt/lists/*
 
-COPY ./node /usr/src/app/
+COPY ./node/package.json /usr/src/app/package.json
+COPY ./node/package-lock.json /usr/src/app/package-lock.json
 RUN npm install

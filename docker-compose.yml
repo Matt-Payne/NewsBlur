@@ -98,6 +98,8 @@ services:
     command: node original_page.js
     ports:
       - 3060:3060
+    volumes: 
+      - ./node:/usr/src/app
   original_text:
     image: jmath1/newsblur_node
     container_name: node_original_text
@@ -106,7 +108,9 @@ services:
     ports:
       - 4040:4040
     command: node original_text.js
-
+    volumes: 
+      - ./node:/usr/src/app
+  
   favicons:
     image: jmath1/newsblur_node
     container_name: node_favicons
@@ -115,7 +119,9 @@ services:
     ports:
       - 3030:3030
     command: node favicons.js
-  
+    volumes: 
+      - ./node:/usr/src/app
+
   node_websocket:
     container_name: node_websocket
     image: jmath1/newsblur_node
@@ -125,7 +131,9 @@ services:
     stop_signal: HUP
     ports:
       - 8888:8888
-
+    volumes: 
+      - ./node:/usr/src/app
+  
   celerybeat:
     container_name: celerybeat
     image: jmath1/newsblur_base
