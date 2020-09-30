@@ -91,7 +91,7 @@ services:
       - ./docker/volumes/db_mongo:/data/db
 
   original_pages:
-    image: jmath1/newsblur_node
+    image: newsblur/newsblur_node
     container_name: node_original_page
     environment:
       - NODE_ENV=development
@@ -101,7 +101,7 @@ services:
     volumes: 
       - ./node:/usr/src/app
   original_text:
-    image: jmath1/newsblur_node
+    image: newsblur/newsblur_node
     container_name: node_original_text
     environment:
       - NODE_ENV=development
@@ -112,7 +112,7 @@ services:
       - ./node:/usr/src/app
   
   favicons:
-    image: jmath1/newsblur_node
+    image: newsblur/newsblur_node
     container_name: node_favicons
     environment:
       - NODE_ENV=docker
@@ -124,7 +124,7 @@ services:
 
   node_websocket:
     container_name: node_websocket
-    image: jmath1/newsblur_node
+    image: newsblur/newsblur_node
     environment:
       - NODE_ENV=docker
     command: node unread_counts.js
@@ -136,7 +136,7 @@ services:
   
   celerybeat:
     container_name: celerybeat
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: bash -c "mkdir -p data &&  /srv/newsblur/manage.py celery beat --schedule=/srv/newsblur/data/celerybeat-schedule.db --loglevel=INFO --pidfile=/srv/celeryd.pid"
     environment: 
       - DOCKERBUILD=True
@@ -147,7 +147,7 @@ services:
   
   celeryd:
     container_name: celeryd
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds,update_feeds"
     volumes:
       - .:/srv/newsblur
@@ -157,7 +157,7 @@ services:
 
   celeryd_beat:
     container_name: celeryd_beat
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_tasks -c 3"
     environment: 
       - DOCKERBUILD=True
@@ -167,7 +167,7 @@ services:
 
   celeryd_beat_feeds:
     container_name: celeryd_beat_feeds
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q beat_feeds_task -c 1"
     environment: 
       - DOCKERBUILD=True
@@ -177,7 +177,7 @@ services:
 
   celeryd_news:
     container_name: celeryd_news
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds"
     environment: 
       - DOCKERBUILD=True
@@ -187,7 +187,7 @@ services:
 
   celeryd_search_indexer:
     container_name: celeryd_search_indexer
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer -c 4"
     environment: 
       - DOCKERBUILD=True
@@ -198,7 +198,7 @@ services:
 
   celeryd_search_indexer_tasker:
     container_name: celeryd_search_indexer_tasker
-    image: jmath1/newsblur_base
+    image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q search_indexer_tasker -c 2"
     environment: 
       - DOCKERBUILD=True
@@ -223,7 +223,7 @@ services:
 
   monitor:
     container_name: monitor
-    image: jmath1/newsblur_base 
+    image: newsblur/newsblur 
     command: bash -c "python /srv/newsblur/flask_monitor/db_monitor.py"
     environment: 
       - DOCKERBUILD=True
