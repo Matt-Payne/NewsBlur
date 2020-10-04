@@ -8,7 +8,7 @@ nb:
 	- [[ -d config/certificates ]] && echo "keys exist" || rm -r config/certificates
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d --build --remove-orphans
 	# wait for the database and then run migrations... there should be a cleaner way to do this
-	- sleep 20
+	- cd node && npm install & cd ..
 	- docker-compose exec newsblur_web ./manage.py syncdb --all --noinput
 	- docker-compose exec newsblur_web ./manage.py migrate --fake
 	- docker-compose exec newsblur_web ./manage.py migrate
@@ -21,7 +21,7 @@ nb-no-build:
 
 # allows user to exec into newsblur_web and use pdb.
 nb-exec:
-	# run `make newsblur` if this doesn't work
+	# run `make nb-no-build` if this doesn't work
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker attach ${newsblur}
 
 # brings down containers
