@@ -2,9 +2,7 @@ version: '3'
 services:
   newsblur_web:
     container_name: newsblur_web
-    build: 
-      context: ./
-      dockerfile: ./docker/Dockerfile
+    image: newsblur/newsblur
     environment: 
       - DOCKERBUILD=True
     stdin_open: true
@@ -27,8 +25,9 @@ services:
         hard: 10000
     ports:
       - '8000:8000'
+    command: gunicorn --bind :8000 wsgi:application
     volumes: 
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
   nginx:
     container_name: nginx
     image: nginx:1.13
@@ -48,7 +47,7 @@ services:
       - DOCKERBUILD=True
     volumes:
     - ./docker/nginx:/etc/nginx/conf.d
-    - .:/srv/newsblur
+    - app-files:/srv/newsblur
 
   postgres:
     container_name: postgres
@@ -99,7 +98,7 @@ services:
     ports:
       - 3060:3060
     volumes: 
-      - ./node:/usr/src/app
+      - node-files:/usr/src/app
   original_text:
     image: newsblur/newsblur_node
     container_name: node_original_text
@@ -107,9 +106,9 @@ services:
       - NODE_ENV=development
     ports:
       - 4040:4040
-    command: node original_text.js
+    command: sleep 100000 #node original_text.js
     volumes: 
-      - ./node:/usr/src/app
+      - node-files:/usr/src/app
   
   favicons:
     image: newsblur/newsblur_node
@@ -120,7 +119,7 @@ services:
       - 3030:3030
     command: node favicons.js
     volumes: 
-      - ./node:/usr/src/app
+      - node-files:/usr/src/app
 
   node_websocket:
     container_name: node_websocket
@@ -132,7 +131,7 @@ services:
     ports:
       - 8888:8888
     volumes: 
-      - ./node:/usr/src/app
+      - node-files:/usr/src/app
   
   celerybeat:
     container_name: celerybeat
@@ -141,7 +140,7 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
       - ./config:/etc/supervisor/conf.d/
 
   
@@ -150,7 +149,7 @@ services:
     image: newsblur/newsblur
     command: "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q new_feeds,push_feeds,update_feeds"
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
     environment: 
       - DOCKERBUILD=True
     user: "${CURRENT_UID}:${CURRENT_GID}"
@@ -162,7 +161,7 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
     user: "${CURRENT_UID}:${CURRENT_GID}"
 
   celeryd_beat_feeds:
@@ -172,7 +171,7 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
     user: "${CURRENT_UID}:${CURRENT_GID}"
 
   celeryd_news:
@@ -182,7 +181,7 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
     user: "${CURRENT_UID}:${CURRENT_GID}"
 
   celeryd_search_indexer:
@@ -192,7 +191,7 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
 
     user: $CURRENT_UID:$CURRENT_GID
 
@@ -203,22 +202,19 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
     user: $CURRENT_UID:$CURRENT_GID
 
   celeryd_work_queue:
     container_name: celeryd_work_queue
-    build:
-      context: .
-      dockerfile: docker/celeryd_work_queue/Dockerfile
+    image: newsblur/newsblur
     command: bash -c "/srv/newsblur/manage.py celery worker --loglevel=INFO -Q work_queue"
     ports:
       - 82:82
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
-      - ./docker/celeryd_work_queue/nginx/:/etc/nginx/conf.d
+      - app-files:/srv/newsblur
     user: $CURRENT_UID:$CURRENT_GID
 
   monitor:
@@ -228,7 +224,7 @@ services:
     environment: 
       - DOCKERBUILD=True
     volumes:
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
     ports:
       - 5000:5000
 
@@ -249,4 +245,16 @@ services:
       - DOCKERBUILD=True
     volumes:
       - ./docker/haproxy/haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg
-      - .:/srv/newsblur
+      - app-files:/srv/newsblur
+
+volumes:
+  app-files:
+    driver_opts:
+      type: nfs
+      device: $PWD
+      o: bind
+  node-files:
+    driver_opts:
+      type: nfs
+      device: $PWD/node
+      o: bind
