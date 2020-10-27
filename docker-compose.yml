@@ -3,6 +3,9 @@ services:
   newsblur_web:
     container_name: newsblur_web
     image: newsblur/newsblur
+    hostname: nb.com
+    dns_search: 
+      - nb.com
     environment: 
       - DOCKERBUILD=True
     stdin_open: true
@@ -56,14 +59,14 @@ services:
       - POSTGRES_USER=newsblur
       - POSTGRES_PASSWORD=newsblur
     ports:
-      - '5432:5432'
+      - '5434:5432'
     volumes:
       - ./docker/volumes/postgres:/var/lib/postgresql/data
 
   redis:
     image: redis:3
     ports:
-      - '6379:6379'
+      - '6579:6379'
     container_name: redis
     volumes:
       - ./docker/volumes/redis:/data
@@ -84,7 +87,7 @@ services:
     container_name: db_mongo
     image: mongo:3.2
     ports:
-      - 27017:27017
+      - 29019:27017
     command: mongod --smallfiles
     volumes:
       - ./docker/volumes/db_mongo:/data/db
@@ -226,8 +229,7 @@ services:
     volumes:
       - app-files:/srv/newsblur
     ports:
-      - 5000:5000
-
+      - 5579:5000
   haproxy:
     container_name: haproxy
     build:
