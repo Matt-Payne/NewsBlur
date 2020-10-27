@@ -2,8 +2,14 @@ newsblur := $(shell docker ps -qf "name=newsblur_web")
 CURRENT_UID := $(shell id -u)
 CURRENT_GID := $(shell id -g)
 
+#creates newsblur, but does not rebuild images or create keys
+nb-start:
+	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose down
+	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d
+
 #creates newsblur, builds new images, and creates/refreshes SSL keys
 nb:
+	- npm install -g nodemon
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose down
 	- [[ -d config/certificates ]] && echo "keys exist" || rm -r config/certificates
 	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d --build --remove-orphans
@@ -13,11 +19,7 @@ nb:
 	- docker-compose exec newsblur_web ./manage.py migrate --fake
 	- docker-compose exec newsblur_web ./manage.py migrate
 	- docker-compose exec newsblur_web ./manage.py loaddata config/fixtures/bootstrap.json
-
-#creates newsblur, but does not rebuild images or create keys
-nb-no-build:
-	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose down
-	- CURRENT_UID=${CURRENT_UID} CURRENT_GID=${CURRENT_GID} docker-compose up -d
+	- nodemon --exec make -e py,js,yml,html,css
 
 # allows user to exec into newsblur_web and use pdb.
 nb-exec:
