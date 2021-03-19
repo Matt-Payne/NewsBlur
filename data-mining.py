@@ -25,6 +25,14 @@ df = get_df_from_database('UserSubscription', ['user','feed_id'])
 
 df = DataFrame(list(UserSubscription.objects.values('user','feed_id')))
 
+# randomly choose users to make data manageable for now
+
+userIds = np.random.choice(df['user'].unique(),
+                                size=int(len(df['user'].unique())*0.3),
+                                replace=False)
+
+df = df.loc[df['user'].isin(userIds)]
+
 # add a followed_feed column, all will be 1 for now but we will add negatives later
 df.loc[:, 'is_following_feed'] = 1
 
@@ -34,14 +42,56 @@ df.loc[:, 'is_following_feed'] = 1
 
 #create df of feed_id and popular_tags
 
-ids = list(FeedData.objects.values('feed'))
+ids = list(FeedData.objects.values('feed_id'))
 input = list(FeedData.objects.values('popular_tags'))
+import ast
+#remove Nones from popular_tags
+def try_conversion(x):
+    try:
+        return ast.literal_eval(x)
+    except Exception as e:
+        return []
+
+def define_bad_tags(x):
+    if x == [] or '[]' or None:
+        return True
+    return False
+
+input = [try_conversion(x.get('popular_tags')) for x in input]
+
+ids = [x.get('feed_id') for x in ids]
+
+tags_df = pd.DataFrame(columns=['feed_id','popular_tags'])
+tags_df['feed_id'] = ids
+tags_df['popular_tags'] = input
+
+#remove feeds with empty tags, or uncategorized, can add [] back in in the main dataset:
+df = df[df['popular_tags'].map(lambda x: x != [])]
+df = df[df['popular_tags'].map(lambda x: x != ['uncategorized'])]
 
 
-df = pd.DataFrame(columns=['feed_id','popular_tags'])
-df['feed_id'] = ids
-df['popular_tags'] = input
-#df['feed_id'] = [ast.literal_eval(x) for x in feed]
+# take just top 3 feeds, and convert the dict pair to strings
+def polish_top_tags(x):
+    fixed = x[:3]
+    return [x[0] for x in x[:3]]
+
+
+df = df['popular_tags'].map(lambda x: polish_top_tags(x))
+
 # popular_tags comes in as a string looking like a list, can convert to real list with:
 import ast
 ast.literal_eval(df['popular_tags'][0])
+tags_df['popular_tags'].str.len().mean()
+
+
+
+
+# Getting num_active_subscribers
+value = Feed.objects.get(pk=13).active_subscribers
+
+def get_active_subs(feed_id):
+    return Feed.objects.get(pk=feed_id).active_subscribers
+
+df['feed_active_subs'] = df['feed_id'].apply(get_active_subs)
+# this might work it takes forever to run:
+df['feed_active_subs'] = df['feed_id'].apply(lambda x: Feed.objects.get(pk=x).active_subscribers)
