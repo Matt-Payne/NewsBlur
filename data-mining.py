@@ -66,7 +66,7 @@ tags_df['feed_id'] = ids
 tags_df['popular_tags'] = input
 
 #remove feeds with empty tags, or uncategorized, can add [] back in in the main dataset:
-df = df[df['popular_tags'].map(lambda x: x != [])]
+df_new = tags_df[tags_df['popular_tags'].map(lambda x: x != [])]
 df = df[df['popular_tags'].map(lambda x: x != ['uncategorized'])]
 
 
@@ -76,7 +76,9 @@ def polish_top_tags(x):
     return [x[0] for x in x[:3]]
 
 
-df = df['popular_tags'].map(lambda x: polish_top_tags(x))
+tags_df['popular_tags'] = df_new['popular_tags'].map(lambda x: polish_top_tags(x))
+
+df_new['popular_tags'] = tags_df['popular_tags']
 
 # popular_tags comes in as a string looking like a list, can convert to real list with:
 import ast
