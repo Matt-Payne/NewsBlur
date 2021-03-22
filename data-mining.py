@@ -27,11 +27,11 @@ df = DataFrame(list(UserSubscription.objects.values('user','feed_id')))
 
 # randomly choose users to make data manageable for now
 
-userIds = np.random.choice(df['user'].unique(),
-                                size=int(len(df['user'].unique())*0.3),
+userIds = np.random.choice(df_users['user'].unique(),
+                                size=int(len(df_users['user'].unique())*0.35),
                                 replace=False)
 
-df = df.loc[df['user'].isin(userIds)]
+df_users = df_users.loc[df_users['user'].isin(userIds)]
 
 # add a followed_feed column, all will be 1 for now but we will add negatives later
 df.loc[:, 'is_following_feed'] = 1
@@ -78,7 +78,7 @@ def polish_top_tags(x):
 
 tags_df['popular_tags'] = df_new['popular_tags'].map(lambda x: polish_top_tags(x))
 
-df_new['popular_tags'] = tags_df['popular_tags']
+df_new['popular_tags'] = tags_df
 
 # popular_tags comes in as a string looking like a list, can convert to real list with:
 import ast
@@ -97,3 +97,18 @@ def get_active_subs(feed_id):
 df['feed_active_subs'] = df['feed_id'].apply(get_active_subs)
 # this might work it takes forever to run:
 df['feed_active_subs'] = df['feed_id'].apply(lambda x: Feed.objects.get(pk=x).active_subscribers)
+
+
+for (u, i) in user_item_set:
+    users.append(u)
+    items.append(i)
+    labels.append(1) # items that the user has interacted with are positive
+    for _ in range(num_negatives):
+        # randomly select an item
+        negative_item = np.random.choice(all_ids)
+        # check that the user has not interacted with this item
+        while (u, negative_item) in user_item_set:
+            negative_item = np.random.choice(all_ids)
+        users.append(u)
+        items.append(negative_item)
+        labels.append(0) # items not interacted with are negative

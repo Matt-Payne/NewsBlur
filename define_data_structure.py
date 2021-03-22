@@ -1,9 +1,11 @@
 ## file to define data flowing into model
 import pandas as pd
 import numpy as np
+from pandas import DataFrame
 import math
 import tensorflow as tf
 import ast
+import pytorch_lightning as pl
 
 def get_users_to_feeds(file):
     return pd.read_csv(file)
@@ -17,6 +19,7 @@ def shrink_users_df(df,user_id):
 
 
 def add_negative_samples(df, item_tag, user_tag,label_tag):
+
     updated_df = pd.DataFrame(columns=[user_tag,item_tag,label_tag])
     all_feeds = df[item_tag].unique()
     users, items, labels = [], [], []
@@ -58,7 +61,7 @@ def train_test_split(full_df):
 
     df_test['user'] = df_test.index
     df_test = df_test[['user', 'feed_id','is_following_feed']]
-    del df_test.index.name
+    df_test = df_test.rename_axis(None, axis=1)
 
     df_train = df.copy(deep=True)
     mask = df.groupby(['user'])['user'].transform(mask_first).astype(bool)
@@ -89,7 +92,7 @@ df_train, df_test = train_test_split(df)
 
 print(df_train.sample(10))
 
-from ncf-impl import NCF
+from ncfImpl import NCF
 
 
 
